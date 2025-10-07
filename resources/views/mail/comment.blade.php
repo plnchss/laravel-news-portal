@@ -1,12 +1,13 @@
 <x-mail::message>
-# Introduction
-
-The body of your message.
-
-<x-mail::button :url="''">
-Button Text
+# Новый комментарий
+Добавлен комментарий с текстом:
+<x-mail::panel>
+{{$comment->text}}
+</x-mail::panel>
+Для статьи: {{ $article_title}}. <br>
+Автор комментария: {{ $author }}.
+<x-mail::button :url="'/comment'">
+Модерация комментариев
 </x-mail::button>
 
-Thanks,<br>
-{{ config('app.name') }}
 </x-mail::message>
