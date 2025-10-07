@@ -33,6 +33,9 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/article/create">Create Article</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/comment">Comment moderation</a>
+        </li>
         @endcan
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/about">About</a>
