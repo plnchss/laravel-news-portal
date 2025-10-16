@@ -6,6 +6,8 @@ use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use App\Events\NewArticleEvent;
 
 
@@ -16,7 +18,10 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        $articles = Article::latest()->paginate(5); 
+        $page = isset($_GET['page']) ? $_GET['page'] : 0;
+        $articles = Cache::remember('articles_'.$page, 300, function(){
+            return Article::latest()->paginate(5); 
+        });
         return view('/article/article', ['articles'=>$articles]);
     }
 
@@ -34,6 +39,10 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
+        $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'articles_*[0-9]'])->get();
+        foreach($keys as $param){
+            Cache::forget($param->key);
+        }
         Gate::authorize('create', Article::class);
         $request->validate([
             'date' => 'required|date',
