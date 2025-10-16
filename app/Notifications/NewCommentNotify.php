@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Comment;
 
 class NewCommentNotify extends Notification
 {
@@ -15,7 +14,7 @@ class NewCommentNotify extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Comment $comment)
+    public function __construct(public string $article_title, public int $article_id)
     {
         //
     }
@@ -49,7 +48,8 @@ class NewCommentNotify extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'comment'=>$this->comment,
+            'article'=>$this->article_title,
+            'article_id'=>$this->article_id,
         ];
     }
 }
