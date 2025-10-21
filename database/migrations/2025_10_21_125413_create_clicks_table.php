@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('comments', function(Blueprint $table){
-            $table->renameColumn('articles_id', 'article_id');
+        Schema::create('clicks', function (Blueprint $table) {
+            $table->integer('article_id');
+            $table->string('article_title');
+            $table->timestamps();
         });
     }
 
@@ -21,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('clicks');
     }
 };
