@@ -1,21 +1,21 @@
 <x-mail::message>
-# Introduction
+# Ежедневная статистика сайта
 
-Количество добавленных комментариев: {{$countComment}}
+Количество добавленных комментариев: {{ $countComment }}
 
-Количество просмотров статей: {{$countArticle[0]['count']}}
+Количество просмотров статей: {{ array_sum(array_column($countArticle, 'count')) }}
 
 Просмотрены следующие статьи:
-@foreach($countArticle as $value)
-    
-        {{$value['article_title']}}
-    
-@endforeach
+@forelse($countArticle as $value)
+- {{ $value['article_title'] }} ({{ $value['count'] }} просмотров)
+@empty
+- Нет просмотров
+@endforelse
 
 <x-mail::button :url="''">
-Button Text
+Перейти на сайт
 </x-mail::button>
 
-Thanks,<br>
+Спасибо,<br>
 {{ config('app.name') }}
 </x-mail::message>

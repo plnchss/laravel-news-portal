@@ -32,7 +32,7 @@ class Commentmail extends Mailable
     {
         // Log::alert(env("MAIL_FROM_ADDRESS"));
         return new Envelope(
-            from: new Address(env("MAIL_FROM_ADDRESS"), 'olga'),
+            from: new Address(env("MAIL_FROM_ADDRESS"), 'polina'),
             subject: 'Commentmail',
         );
     }

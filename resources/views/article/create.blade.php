@@ -9,15 +9,15 @@
 <form action="/article" method="POST">
   @CSRF
   <div class="mb-3">
-    <label for="date" class="form-label">Enter date public</label>
+    <label for="date" class="form-label">Введите дату публикации</label>
     <input type="date" class="form-control" id="date" name="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
   </div>
   <div class="mb-3">
-    <label for="title" class="form-label">Enter title</label>
+    <label for="title" class="form-label">Введите заголовок</label>
     <input type="text" class="form-control" id="title" name="title">
   </div>
   <div class="mb-3">
-    <label for="text" class="form-label">Enter description</label>
+    <label for="text" class="form-label">Введите описание</label>
     <textarea name="text" id="text" class="form-control"></textarea>
   </div>
   <button type="submit" class="btn btn-primary">Save</button>

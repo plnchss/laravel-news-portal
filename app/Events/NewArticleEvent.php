@@ -10,6 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Article;
+use App\Models\User;
+use App\Notifications\NewArticleNotification;
 
 class NewArticleEvent implements ShouldBroadcast
 {
@@ -31,7 +33,7 @@ class NewArticleEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('test'),
+            new Channel('laravel2'),
         ];
     }
     public function broadcastWith(): array
@@ -40,4 +42,9 @@ class NewArticleEvent implements ShouldBroadcast
             'article'=>$this->article,
         ];
     }
+    public function broadcastAs(): string
+{
+    return 'NewArticleEvent';
+}
+
 }

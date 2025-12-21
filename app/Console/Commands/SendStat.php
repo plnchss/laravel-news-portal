@@ -7,7 +7,6 @@ use App\Models\Comment;
 use App\Models\Click;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 use App\Mail\StatMail;
 
 class SendStat extends Command
@@ -24,19 +23,33 @@ class SendStat extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Send daily site statistics to moderator email';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $article_counts = Click::groupBy('article_id')->get()->map(function($item){
-            return ['article_title'=>$item->article_title, 'count'=>$item->count()];
-        });
+        // Получаем статистику просмотров статей
+        $article_counts = Click::groupBy('article_id')
+            ->get()
+            ->map(function($item){
+                return [
+                    'article_title' => $item->article_title ?? 'Нет заголовка',
+                    'count' => $item->count() ?? 0
+                ];
+            })
+            ->toArray(); // Приводим к массиву
+
+        // Очищаем таблицу кликов
         Click::whereNotNull('article_id')->delete();
-        // Log::alert($article_counts);
+
+        // Считаем новые комментарии за сегодня
         $comments = Comment::whereDate('created_at', Carbon::today())->count();
-        Mail::to('moosbeere_O@mail.ru')->send(new StatMail($comments, $article_counts));
+
+        // Отправляем письмо
+        Mail::to('p.nazarenko04@mail.ru')->send(new StatMail($comments, $article_counts));
+
+        $this->info('Статистика отправлена на почту p.nazarenko04@mail.ru');
     }
 }

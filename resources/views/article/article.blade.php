@@ -9,10 +9,10 @@
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">Date public</th>
-      <th scope="col">Title</th>
-      <th scope="col">Text</th>
-      <th scope="col">Author</th>
+      <th scope="col">Дата публикации</th>
+      <th scope="col">Заголовок</th>
+      <th scope="col">Текст</th>
+      <th scope="col">Автор</th>
     </tr>
   </thead>
   <tbody>

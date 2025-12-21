@@ -1,38 +1,78 @@
 @extends('layout')
+
 @section('content')
- @if(session()->has('message'))
-  <div class="alert alert-success" role="alert">
-      {{session('message')}}
-  </div>
+
+@if(session()->has('message'))
+    <div class="alert alert-success" role="alert">
+        {{ session('message') }}
+    </div>
 @endif
 
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Date public</th>
-      <th scope="col">Author</th>
-      <th scope="col">Article</th>
-      <th scope="col">Text</th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
-  <tbody>
-    @foreach($comments as $comment)
-    <tr>
-      <th scope="row">{{$comment->created_at}}</th>
-      <td>{{App\Models\User::FindOrFail($comment->user_id)->name}}</td>
-      <td><a href="/article/{{App\Models\Article::FindOrFail($comment->article_id)->id}}">{{App\Models\Article::FindOrFail($comment->article_id)->title}}</a></td>
-      <td>{{$comment->text}}</td>
-      <td>
-        @if(!$comment->accept)  
-            <a href="/comment/accept/{{$comment->id}}" class="btn btn-primary">Accept</a>
-        @else
-            <a href="/comment/reject/{{$comment->id}}" class="btn btn-warning">Reject</a>
-        @endif
-       </td>
-    </tr>
-    @endforeach
-  </tbody>
+<h3 class="mb-4">Comment moderation</h3>
+
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Date</th>
+            <th>Author</th>
+            <th>Article</th>
+            <th>Text</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($comments as $comment)
+            <tr>
+                <td>{{ $comment->created_at }}</td>
+
+                <td>
+                    {{ \App\Models\User::find($comment->user_id)->name ?? 'Unknown' }}
+                </td>
+
+                <td>
+                    @php
+                        $article = \App\Models\Article::find($comment->article_id);
+                    @endphp
+                    @if($article)
+                        <a href="{{ route('article.show', $article->id) }}">
+                            {{ $article->title }}
+                        </a>
+                    @else
+                        Deleted article
+                    @endif
+                </td>
+
+                <td style="max-width: 400px;">
+                    {{ $comment->text }}
+                </td>
+
+                <td>
+                    <div class="d-flex flex-row gap-2">
+                        <a href="{{ url('/comment/accept/' . $comment->id) }}"
+                           class="btn btn-success btn-sm">
+                            Accept
+                        </a>
+
+                        <a href="{{ url('/comment/reject/' . $comment->id) }}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Reject this comment?')">
+                            Reject
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" class="text-center text-muted">
+                    No comments for moderation
+                </td>
+            </tr>
+        @endforelse
+    </tbody>
 </table>
-{{$comments->links()}}
+
+<div class="mt-3">
+    {{ $comments->links() }}
+</div>
+
 @endsection

@@ -10,7 +10,7 @@
     export default {
     data() { return { article: null } },
         created() {
-            window.Echo.channel('test').listen('NewArticleEvent', (article) => {
+            window.Echo.channel('laravel2').listen('.NewArticleEvent', (article) => {
                 console.log(article);
                 this.article=article.article;
                 // alert('Добавлена новая статья!');

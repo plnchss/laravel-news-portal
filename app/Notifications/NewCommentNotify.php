@@ -25,20 +25,27 @@ class NewCommentNotify extends Notification
      * @return array<int, string>
      */
     public function via(object $notifiable): array
-    {
-        return ['database'];
+{
+    if ($notifiable->role === 'moderator') {
+        return ['database', 'mail']; // модеру идёт и почта, и база
     }
+
+    return ['database']; // ридерам только база
+}
+
 
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
-    }
+    public function toMail(object $notifiable)
+{
+    return (new MailMessage)
+        ->subject("Новый комментарий к статье")
+        ->line("Добавлен комментарий к статье: {$this->article_title}")
+        ->action('Посмотреть статью', url("/article/{$this->article_id}"))
+        ->line('Спасибо, что пользуетесь нашим сайтом!');
+}
+
 
     /**
      * Get the array representation of the notification.

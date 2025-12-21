@@ -56,6 +56,7 @@ class ArticleController extends Controller
         $article->users_id = auth()->id();
         if($article->save()){
             NewArticleEvent::dispatch($article);
+            User::role('reader')->each(fn($user) => $user->notify(new NewArticleNotification($article)));
         }
         return redirect()->route('article.index')->with('message','Create successful');
     }

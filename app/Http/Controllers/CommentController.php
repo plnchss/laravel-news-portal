@@ -17,13 +17,16 @@ use App\Notifications\NewCommentNotify;
 
 class CommentController extends Controller
 {
-    public function index(){
-        $page = (isset($_GET['page'])) ? $_GET["page"] : 0;
-        $comments = Cache::rememberForever('comments_'.$page, function(){
-        return Comment::latest()->paginate(10);
-        });
-        return view('comment.index', ['comments'=>$comments]);
-    }
+    public function index()
+{
+    $comments = Comment::where('accept', 0)
+        ->latest()
+        ->paginate(10);
+
+    return view('comment.index', compact('comments'));
+}
+
+
 
     public function store(Request $request){
 
@@ -45,43 +48,86 @@ class CommentController extends Controller
         return redirect()->route('article.show', $request->article_id)->with('message', "Comment add succesful and enter for moderation");
     }
 
-    public function edit(Comment $comment){
-        Gate::authorize('comment', $comment);
+    public function edit(Comment $comment)
+    {
+    Gate::authorize('comment', $comment);
+
+    return view('comment.edit', compact('comment'));
     }
-    public function update(Comment $comment){
-        Gate::authorize('comment', $comment);
-        if($comment->save()){
-            Cache::flush();
-        }
-        return 0;
+
+
+   public function update(Request $request, Comment $comment)
+   {
+    Gate::authorize('comment', $comment);
+
+    $request->validate([
+        'text' => 'required|min:5',
+    ]);
+
+    $comment->text = $request->text;
+    $comment->save();
+
+    Cache::flush();
+
+    return redirect()
+        ->route('article.show', $comment->article_id)
+        ->with('message', 'Comment updated');
     }
+
 
     public function delete(Comment $comment){
-        Gate::authorize('comment', $comment);
-        if($comment->save()){
-            Cache::forget('comments'.$comment->article_id);
-            $keys = DB::table('cache')->whereRaw('`key` GLOB :key', [':key'=>'comments_*[0-9]'])->get();
-            foreach($keys as $param){
-                Cache::forget($param->key);
-            }
-        }
-        return 0;
+    Gate::authorize('comment', $comment);
+
+    $articleId = $comment->article_id;
+    $comment->delete();
+
+    Cache::flush();
+
+    return redirect()
+        ->route('article.show', $articleId)
+        ->with('message', 'Comment deleted');
     }
 
-    public function accept(Comment $comment){
-        $comment->accept = true;
-        $article = Article::findOrFail($comment->article_id);
-        $users = User::where('id', '!=', $comment->user_id)->get();
-        if($comment->save()){
-            Notification::send($users, new NewCommentNotify($article->title, $article->id));
-            Cache::flush();
+
+   public function accept(Comment $comment)
+{
+    // Отмечаем комментарий как одобренный
+    $comment->accept = true;
+    $article = Article::findOrFail($comment->article_id);
+
+    if ($comment->save()) {
+        // Очищаем кэш комментариев
+        Cache::flush();
+
+        // Получаем всех читателей (role = 'reader'), кроме автора комментария
+        $readers = User::where('role', 'reader')
+            ->where('id', '!=', $comment->user_id)
+            ->get();
+
+        // Получаем всех модераторов (role = 'moderator')
+        $moderators = User::where('role', 'moderator')->get();
+
+        // Отправляем уведомление каждому модератору
+        foreach ($moderators as $moderator) {
+            $moderator->notify(new NewCommentNotify($article->title, $article->id));
         }
-        return redirect()->route('comment.index');
+        foreach ($readers as $reader) {
+            $reader->notify(new NewCommentNotify($article->title, $article->id));
+}
+
     }
 
-    public function reject(Comment $comment){
-        $comment->accept = false;
-        $comment->save();
-        return redirect()->route('comment.index');
-    }
+    return redirect()->route('comment.index')
+        ->with('message', 'Комментарий одобрен и уведомления отправлены.');
+}
+
+
+    public function reject(Comment $comment)
+{
+    $comment->delete();
+    Cache::flush();
+    return redirect()->route('comment.index');
+}
+
+
 }

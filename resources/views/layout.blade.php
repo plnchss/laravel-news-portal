@@ -46,7 +46,7 @@
         @auth
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            New comments <span>{{auth()->user()->UnreadNotifications->count()}}</span>
+            New comments <span>{{auth()->user()->unreadNotifications->count()}}</span>
             </a>
           <ul class="dropdown-menu">
             @foreach(auth()->user()->unreadNotifications as $notify)
