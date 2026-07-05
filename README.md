@@ -16,7 +16,7 @@
 * **API:** Разработан RESTful API для взаимодействия с контентом.
 * **Infrastructure:** Docker (контейнеризация), Mailer (SMTP интеграция)
 
-## ⚙️ Установка
+##  Установка
 1. **Клонируй проект:**
    ```bash
    git clone [https://github.com/plnchss/laravel-news-portal.git](https://github.com/plnchss/laravel-news-portal.git)
